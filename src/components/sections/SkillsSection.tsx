@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import {
@@ -11,64 +11,109 @@ import {
   Globe,
   Terminal,
   Layers,
+  ArrowRight,
+  Cpu,
+  GitBranch,
+  Cloud,
+  FileType,
 } from "lucide-react";
 
 const skills = [
   {
     id: "js",
     name: "JavaScript",
-    icon: <Code2 size={32} />,
+    icon: <Code2 size={40} />,
     color: "#f7df1e",
-    desc: "Modern ES6+ for dynamic web apps",
+    desc: "Core language for interactive web experiences.",
+    achievements: [
+      "Developed complex DOM manipulation scripts",
+      "Built custom animation libraries",
+      "Optimized performance for data-heavy apps",
+    ],
   },
   {
     id: "react",
     name: "React.js",
-    icon: <Globe size={32} />,
+    icon: <Globe size={40} />,
     color: "#61dafb",
-    desc: "Component-based UI architecture",
+    desc: "Building scalable component-based UIs.",
+    achievements: [
+      "Architected large-scale dashboard applications",
+      "Implemented custom hooks and context providers",
+      "Integrated Redux and Zustand for state management",
+    ],
   },
   {
     id: "flutter",
     name: "Flutter",
-    icon: <Smartphone size={32} />,
+    icon: <Smartphone size={40} />,
     color: "#02569b",
-    desc: "Cross-platform mobile development",
+    desc: "Cross-platform mobile app development.",
+    achievements: [
+      "Published apps to Play Store & App Store",
+      "Implemented BLoC pattern for robust state management",
+      "Integrated native platform channels",
+    ],
   },
   {
     id: "node",
     name: "Node.js",
-    icon: <Server size={32} />,
+    icon: <Server size={40} />,
     color: "#339933",
-    desc: "Backend services and APIs",
+    desc: "Scalable backend services and REST APIs.",
+    achievements: [
+      "Built RESTful APIs with Express.js",
+      "Implemented JWT authentication & authorization",
+      "Handled real-time data with Socket.io",
+    ],
   },
   {
     id: "firebase",
     name: "Firebase",
-    icon: <Database size={32} />,
+    icon: <Database size={40} />,
     color: "#ffca28",
-    desc: "Real-time database and authentication",
+    desc: "Serverless backend and real-time database.",
+    achievements: [
+      "Configured Firestore security rules",
+      "Implemented Cloud Functions for automation",
+      "Set up push notifications with FCM",
+    ],
   },
   {
     id: "n8n",
     name: "n8n",
-    icon: <Workflow size={32} />,
+    icon: <Workflow size={40} />,
     color: "#ff6b6b",
-    desc: "Workflow automation pipelines",
+    desc: "Workflow automation and integrations.",
+    achievements: [
+      "Automated email marketing workflows",
+      "Synced data between CRM and databases",
+      "Created custom webhooks for external APIs",
+    ],
   },
   {
     id: "docker",
     name: "Docker",
-    icon: <Layers size={32} />,
+    icon: <Layers size={40} />,
     color: "#2496ed",
-    desc: "Containerization and deployment",
+    desc: "Containerization for consistent deployments.",
+    achievements: [
+      "Dockerized Node.js and React applications",
+      "Managed multi-container setups with Docker Compose",
+      "Optimized image sizes for production",
+    ],
   },
   {
     id: "linux",
     name: "Linux",
-    icon: <Terminal size={32} />,
-    color: "#f7df1e",
-    desc: "System administration & scripting",
+    icon: <Terminal size={40} />,
+    color: "#f7df1e", // Keeping yellow/gold theme
+    desc: "System administration and shell scripting.",
+    achievements: [
+      "Managed VPS environments (Ubuntu/Debian)",
+      "Automated backups with Bash scripts",
+      "Configured Nginx reverse proxies",
+    ],
   },
 ];
 
@@ -76,101 +121,157 @@ const SkillsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   useScrollAnimation(sectionRef);
   const [activeSkill, setActiveSkill] = useState(skills[1]); // Default to React
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const activeIndex = skills.findIndex((s) => s.id === activeSkill.id);
+  const angleStep = 360 / skills.length;
+  const rotation = 270 - activeIndex * angleStep;
 
   return (
     <section
       id="skills"
       ref={sectionRef}
-      className="py-20 px-4 md:px-8 bg-[#0a0a0f] overflow-hidden"
+      className="relative h-screen flex flex-col bg-[#0a0a0f] overflow-hidden pt-20 pb-0"
     >
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-12">
-        {/* Left Info */}
-        <div className="lg:col-span-1 space-y-6">
-          <h2 className="text-3xl md:text-5xl font-bold">
-            My <span className="text-blue-500">Skills</span>
-          </h2>
-          <p className="text-gray-400 text-lg leading-relaxed">
-            My journey started with web development, evolved into mobile apps
-            with Flutter, and is now expanding into DevOps and automation.
-          </p>
-          <a
-            href="#contact"
-            className="inline-block px-6 py-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition-all"
+      {/* Background Ambient Glow */}
+      <div
+        className="absolute top-0 left-0 w-full h-full opacity-20 pointer-events-none transition-colors duration-700"
+        style={{
+          background: `radial-gradient(circle at 50% 30%, ${activeSkill.color}, transparent 70%)`,
+        }}
+      />
+
+      {/* Center Active Skill Display */}
+      <div className="flex-1 flex flex-col items-center justify-center relative z-10 mt-8 md:mt-0 w-full max-w-5xl mx-auto px-4">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeSkill.id}
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.9 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="text-center w-full"
           >
-            Contact Me
-          </a>
-        </div>
-
-        {/* Center & Right - Interactive Wheel */}
-        <div className="lg:col-span-2 relative min-h-[500px] flex items-center justify-center">
-          {/* Center Highlight */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeSkill.id}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3 }}
-              className="absolute z-20 flex flex-col items-center text-center p-8 rounded-full bg-[#0f0f14] border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] w-64 h-64 justify-center"
-            >
+            {/* Large Glowing Icon */}
+            <div className="relative inline-block mb-6 md:mb-8">
               <div
-                className="mb-4 p-4 rounded-full bg-white/5"
-                style={{
-                  color: activeSkill.color,
-                  boxShadow: `0 0 20px ${activeSkill.color}40`,
-                }}
-              >
-                {activeSkill.icon}
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">
-                {activeSkill.name}
-              </h3>
-              <p className="text-sm text-gray-400">{activeSkill.desc}</p>
-
-              {/* Neon Glow Background */}
-              <div
-                className="absolute inset-0 rounded-full -z-10 opacity-20 blur-2xl"
+                className="absolute inset-0 blur-3xl opacity-40 rounded-full"
                 style={{ backgroundColor: activeSkill.color }}
               />
-            </motion.div>
-          </AnimatePresence>
+              <div
+                className="relative w-20 h-20 md:w-32 md:h-32 rounded-3xl bg-[#1a1a20] border border-white/10 flex items-center justify-center shadow-2xl mx-auto"
+                style={{
+                  boxShadow: `0 0 30px ${activeSkill.color}30`,
+                  borderColor: `${activeSkill.color}40`,
+                }}
+              >
+                <div style={{ color: activeSkill.color }}>
+                  {React.cloneElement(
+                    activeSkill.icon as React.ReactElement<{ size: number }>,
+                    { size: isMobile ? 48 : 64 }
+                  )}
+                </div>
+              </div>
+            </div>
 
-          {/* Orbiting Skills */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-[350px] h-[350px] md:w-[500px] md:h-[500px] rounded-full border border-white/5 relative animate-spin-slow">
-              {skills.map((skill, index) => {
-                const angle = (index / skills.length) * 2 * Math.PI;
-                const radius = 50; // Percentage
-                const x = 50 + 50 * Math.cos(angle);
-                const y = 50 + 50 * Math.sin(angle);
+            <h1 className="text-3xl md:text-6xl font-bold text-white mb-4">
+              {activeSkill.name}
+            </h1>
+            <p className="text-lg md:text-xl text-gray-400 mb-8 md:mb-12 font-light max-w-2xl mx-auto">
+              {activeSkill.desc}
+            </p>
 
-                return (
-                  <button
-                    key={skill.id}
-                    onClick={() => setActiveSkill(skill)}
-                    className={`absolute w-12 h-12 md:w-16 md:h-16 -ml-6 -mt-6 md:-ml-8 md:-mt-8 rounded-full flex items-center justify-center border transition-all duration-300 ${
-                      activeSkill.id === skill.id
-                        ? "bg-white/10 border-white scale-110"
-                        : "bg-[#0a0a0f] border-white/10 hover:border-white/50 hover:scale-110"
-                    }`}
+            {/* Achievements List */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-left max-w-4xl mx-auto">
+              {activeSkill.achievements.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2 + i * 0.1 }}
+                  className="bg-[#121218] border border-white/5 rounded-2xl p-4 md:p-6 hover:bg-white/5 transition-colors h-full flex flex-col"
+                >
+                  <div
+                    className="w-3 h-3 rounded-full mb-3 md:mb-4"
+                    style={{ backgroundColor: activeSkill.color }}
+                  />
+                  <p className="text-gray-300 leading-relaxed text-sm md:text-base">
+                    {item}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      {/* Bottom Wheel (Arc) */}
+      <div className="relative h-[250px] md:h-[400px] w-full overflow-hidden mt-8 md:mt-12">
+        {/* The Wheel Container */}
+        <motion.div
+          className="absolute top-[40%] left-1/2 rounded-full border border-white/10 bg-[#0f0f14]/50 backdrop-blur-sm origin-center"
+          style={{
+            width: isMobile ? "500px" : "800px",
+            height: isMobile ? "500px" : "800px",
+            marginLeft: isMobile ? "-250px" : "-400px",
+          }}
+          animate={{ rotate: rotation }}
+          transition={{ type: "spring", stiffness: 40, damping: 15 }}
+        >
+          {/* Icons on the Wheel */}
+          {skills.map((skill, index) => {
+            const angleDeg = index * angleStep;
+            const currentRadius = isMobile ? 250 : 400;
+
+            return (
+              <div
+                key={skill.id}
+                className="absolute top-1/2 left-1/2 w-0 h-0 flex items-center justify-center"
+                style={{
+                  transform: `rotate(${angleDeg}deg) translate(${currentRadius}px)`,
+                }}
+              >
+                {/* Counter-rotate the icon container so it stays upright relative to the screen */}
+                <motion.button
+                  onClick={() => setActiveSkill(skill)}
+                  animate={{ rotate: -rotation - angleDeg }}
+                  transition={{ type: "spring", stiffness: 40, damping: 15 }}
+                  className={`group relative flex items-center justify-center rounded-full border transition-all duration-300 aspect-square ${
+                    activeSkill.id === skill.id
+                      ? "bg-white/20 scale-125 shadow-[0_0_20px_rgba(255,255,255,0.3)] z-20"
+                      : "bg-[#0a0a0f] border-white/10 hover:scale-110 hover:border-white/50 z-10"
+                  }`}
+                  style={{
+                    width: isMobile ? "48px" : "80px",
+                    height: isMobile ? "48px" : "80px",
+                    borderColor:
+                      activeSkill.id === skill.id ? skill.color : undefined,
+                  }}
+                >
+                  <div
+                    className="transition-colors duration-300"
                     style={{
-                      left: `${x}%`,
-                      top: `${y}%`,
-                      transform: `rotate(-${(index / skills.length) * 360}deg)`, // Counter-rotate to keep icons upright if parent spins
+                      color:
+                        activeSkill.id === skill.id ? skill.color : "#6b7280",
                     }}
                   >
-                    <div style={{ color: skill.color }}>
-                      {React.cloneElement(
-                        skill.icon as React.ReactElement<{ size: number }>,
-                        { size: 24 }
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+                    {React.cloneElement(
+                      skill.icon as React.ReactElement<{ size: number }>,
+                      { size: isMobile ? 24 : 32 }
+                    )}
+                  </div>
+                </motion.button>
+              </div>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );
