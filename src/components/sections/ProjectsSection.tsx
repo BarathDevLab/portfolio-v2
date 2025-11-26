@@ -1,6 +1,6 @@
 "use client";
-import React, { useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { ExternalLink, Github, FileText, CheckCircle2 } from "lucide-react";
 import ParallaxImage from "@/components/ui/ParallaxImage";
@@ -221,89 +221,119 @@ const projects: Project[] = [
   },
 ];
 
+const ProjectImage = ({
+  project,
+  setActiveProject,
+}: {
+  project: Project;
+  setActiveProject: (p: Project) => void;
+}) => {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { margin: "-50% 0px -50% 0px" });
+
+  useEffect(() => {
+    if (isInView) {
+      setActiveProject(project);
+    }
+  }, [isInView, project, setActiveProject]);
+
+  return (
+    <div ref={ref} className="h-screen flex items-center justify-center p-8">
+      <div
+        className={`relative w-full aspect-square md:aspect-video rounded-3xl overflow-hidden bg-linear-to-br ${project.gradient} p-1 group transition-all duration-500`}
+      >
+        <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
+        <div className="w-full h-full bg-[#0f0f14] rounded-2xl overflow-hidden relative">
+          {/* Image Placeholder - Replace with Next.js Image */}
+          <div className="relative w-full h-full bg-[#0a0a0f] flex items-center justify-center group-hover:scale-105 transition-transform duration-700">
+            <div className="text-center p-6">
+              <h3 className="text-3xl font-bold text-white/20 mb-2">
+                {project.title}
+              </h3>
+              <p className="text-white/10 text-lg">High Quality Image</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   useScrollAnimation(sectionRef);
+  const [activeProject, setActiveProject] = useState<Project>(projects[0]);
 
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className="py-20 px-4 md:px-8 bg-[#0a0a0f] min-h-screen"
+      className="bg-[#0a0a0f] min-h-screen"
     >
-      <div className="max-w-7xl mx-auto space-y-32">
-        {projects.map((project, index) => (
-          <motion.div
-            key={project.id}
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.6 }}
-            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
-          >
-            {/* Visual Side (Image) */}
-            <div
-              className={`relative aspect-4/3 rounded-3xl overflow-hidden bg-linear-to-br ${project.gradient} p-8 md:p-12 group`}
+      <div className="pt-20 pb-10 text-center px-4">
+        <h2 className="text-4xl md:text-6xl font-bold text-white mb-4">
+          Featured <span className="text-blue-500">Projects</span>
+        </h2>
+        <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          A collection of my recent work in web and mobile development.
+        </p>
+      </div>
+
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Column: Scrollable Images */}
+        <div className="flex flex-col">
+          {projects.map((project) => (
+            <ProjectImage
+              key={project.id}
+              project={project}
+              setActiveProject={setActiveProject}
+            />
+          ))}
+        </div>
+
+        {/* Right Column: Sticky Content */}
+        <div className="hidden lg:flex h-screen sticky top-0 items-center justify-center p-8">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeProject.id}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-8 w-full max-w-lg"
             >
-              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
-
-              {/* Mock Browser/App Window */}
-              <div className="w-full h-full bg-[#0f0f14] rounded-xl shadow-2xl overflow-hidden border border-white/10 relative transform group-hover:scale-[1.02] transition-transform duration-500">
-                {/* Header Bar */}
-                <div className="h-8 bg-[#1a1a20] border-b border-white/5 flex items-center px-4 gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/20" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/20" />
-                </div>
-
-                {/* Image Placeholder */}
-                <div className="relative w-full h-full bg-[#0a0a0f] flex items-center justify-center group-hover:bg-[#0f0f14] transition-colors">
-                  {/* If you have actual images, use Next.js Image here. For now, text/icon placeholder */}
-                  <div className="text-center p-6">
-                    <h3 className="text-2xl font-bold text-white/20 mb-2">
-                      {project.title}
-                    </h3>
-                    <p className="text-white/10 text-sm">Project Screenshot</p>
-                  </div>
-                  {/* Overlay Content similar to reference image */}
-                  <div className="absolute bottom-6 left-6 right-6">
-                    <div className="bg-black/40 backdrop-blur-md border border-white/10 p-4 rounded-xl">
-                      <p className="text-white font-medium">
-                        {project.shortDesc}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Content Side */}
-            <div className="space-y-8">
               <div>
                 <div className="flex items-center gap-4 mb-4">
                   <div
-                    className={`h-px w-12 bg-linear-to-r ${project.gradient}`}
+                    className={`h-px w-12 bg-linear-to-r ${activeProject.gradient}`}
                   />
                   <span
-                    className={`text-lg font-medium bg-clip-text text-transparent bg-linear-to-r ${project.gradient}`}
+                    className={`text-lg font-medium bg-clip-text text-transparent bg-linear-to-r ${activeProject.gradient}`}
                   >
-                    {project.category}
+                    {activeProject.category}
                   </span>
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-                  {project.title}
+                <h2 className="text-5xl font-bold text-white mb-6 leading-tight">
+                  {activeProject.title}
                 </h2>
-                <p className="text-gray-400 text-lg leading-relaxed">
-                  {project.fullDesc.solution} {project.fullDesc.impact}
+                <p className="text-gray-400 text-xl leading-relaxed">
+                  {activeProject.fullDesc.solution}{" "}
+                  {activeProject.fullDesc.impact}
                 </p>
               </div>
 
               {/* Features List */}
-              <ul className="space-y-3">
-                {project.features.map((feature, i) => (
-                  <li key={i} className="flex items-start gap-3 text-gray-300">
-                    <span
-                      className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-linear-to-r ${project.gradient}`}
+              <ul className="space-y-4">
+                {activeProject.features.map((feature, i) => (
+                  <li
+                    key={i}
+                    className="flex items-center gap-3 text-gray-300 text-lg"
+                  >
+                    <CheckCircle2
+                      className={`text-${
+                        activeProject.gradient.split("-")[1]
+                      }-500`}
+                      size={20}
                     />
                     {feature}
                   </li>
@@ -311,41 +341,39 @@ const ProjectsSection = () => {
               </ul>
 
               {/* Tech Stack */}
-              <div className="flex flex-wrap gap-3">
-                {project.tech.map((t, i) => (
+              <div className="flex flex-wrap gap-3 pt-4">
+                {activeProject.tech.map((t, i) => (
                   <span
                     key={i}
-                    className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 transition-colors flex items-center gap-2"
+                    className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 transition-colors"
                   >
-                    {/* Simple dot for tech icon placeholder */}
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
                     {t}
                   </span>
                 ))}
               </div>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap gap-4 pt-4">
-                {project.links.demo && (
+              <div className="flex flex-wrap gap-4 pt-8">
+                {activeProject.links.demo && (
                   <a
-                    href={project.links.demo}
-                    className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition-colors flex items-center gap-2"
+                    href={activeProject.links.demo}
+                    className="px-8 py-4 bg-white text-black rounded-full font-bold hover:bg-gray-200 transition-colors flex items-center gap-2"
                   >
-                    <ExternalLink size={18} /> Live Demo
+                    <ExternalLink size={20} /> Live Demo
                   </a>
                 )}
-                {project.links.github && (
+                {activeProject.links.github && (
                   <a
-                    href={project.links.github}
-                    className="px-6 py-3 bg-transparent border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
+                    href={activeProject.links.github}
+                    className="px-8 py-4 bg-transparent border border-white/20 text-white rounded-full font-bold hover:bg-white/10 transition-colors flex items-center gap-2"
                   >
-                    <Github size={18} /> Source Code
+                    <Github size={20} /> Source Code
                   </a>
                 )}
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </section>
   );
