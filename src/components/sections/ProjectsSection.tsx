@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 import { ExternalLink, Github, FileText, CheckCircle2 } from "lucide-react";
@@ -224,160 +224,128 @@ const projects: Project[] = [
 const ProjectsSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
   useScrollAnimation(sectionRef);
-  const [selectedProject, setSelectedProject] = useState<Project>(projects[0]);
 
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className="py-20 px-4 md:px-8 bg-[#0f0f14]"
+      className="py-20 px-4 md:px-8 bg-[#0a0a0f] min-h-screen"
     >
-      <div className="max-w-7xl mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold mb-12 text-center">
-          Featured <span className="text-blue-500">Projects</span>
-        </h2>
+      <div className="max-w-7xl mx-auto space-y-32">
+        {projects.map((project, index) => (
+          <motion.div
+            key={project.id}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.6 }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center"
+          >
+            {/* Visual Side (Image) */}
+            <div
+              className={`relative aspect-4/3 rounded-3xl overflow-hidden bg-linear-to-br ${project.gradient} p-8 md:p-12 group`}
+            >
+              <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-500" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-[800px]">
-          {/* Left Panel - Scrollable List */}
-          <div className="lg:col-span-5 overflow-y-auto pr-4 space-y-4 scrollbar-hide h-full">
-            {projects.map((project) => (
-              <motion.div
-                key={project.id}
-                onClick={() => setSelectedProject(project)}
-                whileHover={{ scale: 1.02 }}
-                className={`p-4 rounded-xl cursor-pointer border transition-all duration-300 ${
-                  selectedProject.id === project.id
-                    ? "bg-white/10 border-blue-500/50 shadow-lg"
-                    : "bg-white/5 border-white/5 hover:bg-white/10"
-                }`}
-              >
-                <div
-                  className={`h-32 rounded-lg mb-4 bg-linear-to-br ${project.gradient} opacity-80`}
-                />
-                <h3 className="text-xl font-bold text-white">
-                  {project.title}
-                </h3>
-                <p className="text-sm text-gray-400 mt-1">
-                  {project.shortDesc}
-                </p>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {project.tech.slice(0, 3).map((t, i) => (
-                    <span
-                      key={i}
-                      className="text-xs px-2 py-1 rounded-full bg-black/30 text-gray-300 border border-white/10"
-                    >
-                      {t}
-                    </span>
-                  ))}
+              {/* Mock Browser/App Window */}
+              <div className="w-full h-full bg-[#0f0f14] rounded-xl shadow-2xl overflow-hidden border border-white/10 relative transform group-hover:scale-[1.02] transition-transform duration-500">
+                {/* Header Bar */}
+                <div className="h-8 bg-[#1a1a20] border-b border-white/5 flex items-center px-4 gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/20" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/20" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/20" />
                 </div>
-              </motion.div>
-            ))}
-          </div>
 
-          {/* Right Panel - Fixed Details */}
-          <div className="hidden lg:col-span-7 lg:block h-full sticky top-0">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedProject.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="bg-[#0a0a0f] border border-white/10 rounded-2xl p-8 h-full flex flex-col"
-              >
-                <div
-                  className={`w-full h-64 rounded-xl mb-8 bg-linear-to-br ${selectedProject.gradient} relative overflow-hidden`}
-                >
-                  <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-white/20">
-                    Project Preview
+                {/* Image Placeholder */}
+                <div className="relative w-full h-full bg-[#0a0a0f] flex items-center justify-center group-hover:bg-[#0f0f14] transition-colors">
+                  {/* If you have actual images, use Next.js Image here. For now, text/icon placeholder */}
+                  <div className="text-center p-6">
+                    <h3 className="text-2xl font-bold text-white/20 mb-2">
+                      {project.title}
+                    </h3>
+                    <p className="text-white/10 text-sm">Project Screenshot</p>
+                  </div>
+                  {/* Overlay Content similar to reference image */}
+                  <div className="absolute bottom-6 left-6 right-6">
+                    <div className="bg-black/40 backdrop-blur-md border border-white/10 p-4 rounded-xl">
+                      <p className="text-white font-medium">
+                        {project.shortDesc}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-3xl font-bold text-white">
-                    {selectedProject.title}
-                  </h2>
-                  <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 text-sm font-medium border border-blue-500/30">
-                    {selectedProject.category}
+            {/* Content Side */}
+            <div className="space-y-8">
+              <div>
+                <div className="flex items-center gap-4 mb-4">
+                  <div
+                    className={`h-px w-12 bg-linear-to-r ${project.gradient}`}
+                  />
+                  <span
+                    className={`text-lg font-medium bg-clip-text text-transparent bg-linear-to-r ${project.gradient}`}
+                  >
+                    {project.category}
                   </span>
                 </div>
+                <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+                  {project.title}
+                </h2>
+                <p className="text-gray-400 text-lg leading-relaxed">
+                  {project.fullDesc.solution} {project.fullDesc.impact}
+                </p>
+              </div>
 
-                <div className="space-y-6 flex-1">
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white/5 p-4 rounded-lg">
-                      <h4 className="text-sm text-gray-400 mb-1">Problem</h4>
-                      <p className="text-sm text-white">
-                        {selectedProject.fullDesc.problem}
-                      </p>
-                    </div>
-                    <div className="bg-white/5 p-4 rounded-lg">
-                      <h4 className="text-sm text-gray-400 mb-1">Solution</h4>
-                      <p className="text-sm text-white">
-                        {selectedProject.fullDesc.solution}
-                      </p>
-                    </div>
-                    <div className="bg-white/5 p-4 rounded-lg">
-                      <h4 className="text-sm text-gray-400 mb-1">Impact</h4>
-                      <p className="text-sm text-white">
-                        {selectedProject.fullDesc.impact}
-                      </p>
-                    </div>
-                  </div>
+              {/* Features List */}
+              <ul className="space-y-3">
+                {project.features.map((feature, i) => (
+                  <li key={i} className="flex items-start gap-3 text-gray-300">
+                    <span
+                      className={`mt-1.5 w-1.5 h-1.5 rounded-full bg-linear-to-r ${project.gradient}`}
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
 
-                  <div>
-                    <h4 className="text-lg font-semibold mb-3">Key Features</h4>
-                    <ul className="grid grid-cols-2 gap-2">
-                      {selectedProject.features.map((feature, i) => (
-                        <li
-                          key={i}
-                          className="flex items-center gap-2 text-gray-300"
-                        >
-                          <CheckCircle2 size={16} className="text-green-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              {/* Tech Stack */}
+              <div className="flex flex-wrap gap-3">
+                {project.tech.map((t, i) => (
+                  <span
+                    key={i}
+                    className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-gray-300 hover:bg-white/10 transition-colors flex items-center gap-2"
+                  >
+                    {/* Simple dot for tech icon placeholder */}
+                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500" />
+                    {t}
+                  </span>
+                ))}
+              </div>
 
-                  <div>
-                    <h4 className="text-lg font-semibold mb-3">Tech Stack</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedProject.tech.map((t, i) => (
-                        <span
-                          key={i}
-                          className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-gray-300"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 mt-8 pt-6 border-t border-white/10">
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-4 pt-4">
+                {project.links.demo && (
                   <a
-                    href={selectedProject.links.demo}
-                    className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                    href={project.links.demo}
+                    className="px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-gray-200 transition-colors flex items-center gap-2"
                   >
                     <ExternalLink size={18} /> Live Demo
                   </a>
+                )}
+                {project.links.github && (
                   <a
-                    href={selectedProject.links.github}
-                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+                    href={project.links.github}
+                    className="px-6 py-3 bg-transparent border border-white/20 text-white rounded-full font-medium hover:bg-white/10 transition-colors flex items-center gap-2"
                   >
-                    <Github size={18} /> GitHub Repo
+                    <Github size={18} /> Source Code
                   </a>
-                  <a
-                    href={selectedProject.links.caseStudy}
-                    className="flex-1 py-3 bg-white/5 hover:bg-white/10 border border-white/10 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
-                  >
-                    <FileText size={18} /> Case Study
-                  </a>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        ))}
       </div>
     </section>
   );
