@@ -1,7 +1,8 @@
 "use client";
 import React, { useRef } from "react";
-import { Laptop, Rocket, Settings, GitCommit } from "lucide-react";
+import { Laptop, Rocket, Settings } from "lucide-react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
+import GitHubActivity from "@/components/ui/GitHubActivity";
 
 const AboutSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -69,30 +70,7 @@ const AboutSection = () => {
               </p>
             </div>
 
-            <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
-              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <GitCommit className="text-blue-500" /> GitHub Activity
-              </h3>
-              {/* Placeholder for GitHub Graph - In a real app, use react-activity-calendar */}
-              <div className="flex gap-1 flex-wrap">
-                {Array.from({ length: 52 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-sm ${
-                      Math.random() > 0.7
-                        ? "bg-green-500"
-                        : Math.random() > 0.4
-                        ? "bg-green-500/50"
-                        : "bg-white/10"
-                    }`}
-                  />
-                ))}
-              </div>
-              <div className="flex justify-between mt-4 text-sm text-gray-400">
-                <span>Less</span>
-                <span>More</span>
-              </div>
-            </div>
+            <GitHubActivity />
           </div>
 
           {/* Right Column - Timeline */}
