@@ -66,7 +66,7 @@ const RagChat: React.FC<RagChatProps> = ({ isModal = false, onClose }) => {
       const data = await response.json();
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: data.response || data.message || "Sorry, I couldn't process that." },
+        { role: "assistant", content: data.answer || data.response || data.message || "Sorry, I couldn't process that." },
       ]);
     } catch (err) {
       setError("Failed to connect. Please try again.");
